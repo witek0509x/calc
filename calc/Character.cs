@@ -117,4 +117,81 @@ namespace calc
             return float.Parse(expression);
         }
     }
+
+    class Brackets : Character
+    {
+        public override float split(string expression)
+        {
+            int numberOfBrackets = 0;
+            int[] isIt = new int[expression.Length];
+            for (int i = 0; i < expression.Length; i++)
+            {
+                isIt[i] = 0;
+            }
+            for (int i = 0; i < expression.Length; i++)
+            {
+                if (expression[i] == '(') isIt[i] = 1;
+                if (expression[i] == ')') isIt[i] = 2;
+            }
+            int j = 0;
+            List<string> pieces = new List<string>();
+            List<string> result = new List<string>();
+            List<char> charaList = new List<char>();
+            bool first = true;
+            for (int i = 0; i < expression.Length; i++)
+            {
+                if (i == expression.Length - 1 && expression[i] != '(' && expression[i] != ')')
+                {
+                    if (first)
+                    {
+                        pieces.Add(expression[i].ToString());
+                        first = false;
+                    }
+                    else
+                    {
+                        pieces[j] += expression[i];
+                    }
+                }
+                else if (expression[i] == ')')
+                {
+                    j++;
+                    if (i != expression.Length-1) charaList.Add(expression[i + 1]);
+                    i++;
+                    first = true;
+                }
+                else if (expression[i] != '(' && expression[i+1] != '(' && expression[i] != ')')
+                {
+                    if (first)
+                    {
+                        pieces.Add(expression[i].ToString());
+                        first = false;
+                    }
+                    else
+                    {
+                        pieces[j] += expression[i];
+                    }
+                }
+                else if (expression[i + 1] == '(')
+                {
+                    j++;
+                    charaList.Add(expression[i]);
+                    i++;
+                    first = true;
+                }
+            }
+            foreach (var piece in pieces)
+            {
+                result.Add(next.split(piece).ToString());
+            }
+
+            string outer = "";
+            for (int i = 0; i < result.Count; i++)
+            {
+                outer += result[i];
+                if (i != result.Count - 1) outer += charaList[i];
+            }
+            return next.split(outer);
+        }
+    }
+
 }
